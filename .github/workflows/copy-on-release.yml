@@ -12,16 +12,19 @@ jobs:
     steps:
       - name: Checkout source repository
         uses: actions/checkout@v2
-        with:
-          repository: dinethsiriwardana/My-Porfolio
-          token: ${{ secrets.SOURCE_TOKEN }}
 
       - name: Copy files on release
+        uses: andstor/copycat-action@v1
+        with:
+          source-repository: dinethsiriwardana/My-Porfolio
+          source-token: ${{ secrets.SOURCE_TOKEN }}
+          source-path: .
+          destination-path: .
+
+      - name: Commit and push changes
         run: |
-          if [[ "$(git log --format=%B -n 1)" == "release" ]]; then
-            cp -r ./ dineth.me-v2
-            cd dineth.me-v2
-            git add .
-            git commit -m "Copy from My-Porfolio on release"
-            git push origin master
-          fi
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Copy from My-Porfolio on release"
+          git push origin master
