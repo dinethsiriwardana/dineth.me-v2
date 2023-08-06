@@ -1,30 +1,31 @@
-name: Copy on Release
+name: Copy Repository
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
-  copy-on-release:
+  copy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source repository
+      - name: Checkout repository one
         uses: actions/checkout@v2
-
-      - name: Copy files on release
-        uses: andstor/copycat-action@v1
         with:
-          source-repository: dinethsiriwardana/My-Porfolio
-          source-token: ${{ secrets.SOURCE_TOKEN }}
-          source-path: .
-          destination-path: .
+          repository: dinethsiriwardana/My-Porfolio
 
-      - name: Commit and push changes
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: My-Porfolio
+
+      - name: Checkout repository two
+        uses: actions/checkout@v2
+        with:
+          repository: dinethsiriwardana/dineth.me-v2
+
+      - name: Copy files
+        uses: actions/download-artifact@v2
+        with:
+          name: My-Porfolio
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Copy from My-Porfolio on release"
-          git push origin master
+          cp -R ${{ github.workspace }}/My-Porfolio/. ${{ github.workspace }}/dineth.me-v2/
